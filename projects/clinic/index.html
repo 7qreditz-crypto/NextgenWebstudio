@@ -1,13 +1,933 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Clinic Demo</title>
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DermLux Clinic — Healthy Skin Starts Here</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+:root{
+  --cream:#FAF7F2;--beige:#F0E8DC;--sand:#E5D5C0;
+  --warm:#D4845A;--blush:#F2C4A8;--deep:#2C1810;--mid-br:#6B4C3B;
+  --td:#1A1208;--tm:#5C4033;--tl:#9C7B6A;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--td);overflow-x:hidden;cursor:none;font-size:14px}
 
+/* CURSOR */
+.cursor{width:8px;height:8px;background:var(--warm);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .3s,height .3s}
+.cursor-ring{width:30px;height:30px;border:1.5px solid var(--warm);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,opacity .3s}
+.scroll-progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--warm),var(--blush));z-index:9999;width:0;transition:width .1s}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 4%;display:flex;align-items:center;justify-content:space-between;height:60px;background:rgba(250,247,242,.94);backdrop-filter:blur(18px);border-bottom:1px solid rgba(212,132,90,.1);transition:all .3s}
+nav.scrolled{height:52px;box-shadow:0 3px 18px rgba(44,24,16,.06)}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.42rem;font-weight:600;color:var(--td);text-decoration:none}
+.logo span{color:var(--warm)}
+.nav-links{display:flex;gap:1.8rem;list-style:none;align-items:center}
+.nav-links a{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--tm);text-decoration:none;transition:color .3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--warm);transition:width .3s}
+.nav-links a:hover{color:var(--warm)}.nav-links a:hover::after{width:100%}
+.nav-cta{background:var(--warm)!important;color:#fff!important;padding:.45rem 1.1rem;border-radius:100px;font-size:.71rem!important;transition:background .3s!important}
+.nav-cta:hover{background:var(--mid-br)!important}.nav-cta::after{display:none!important}
+.hamburger{display:none;flex-direction:column;gap:4px;cursor:none}
+.hamburger span{width:22px;height:1.5px;background:var(--td)}
+.mob-menu{position:fixed;inset:0;background:var(--cream);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;transform:translateX(100%);transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.mob-menu.open{transform:translateX(0)}
+.mob-menu a{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--td);text-decoration:none;transition:color .3s}
+.mob-menu a:hover{color:var(--warm)}.mob-close{position:absolute;top:20px;right:5%;font-size:1.3rem;cursor:none}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding:60px 4% 0}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 55% 65% at 88% 50%,rgba(232,168,130,.18) 0%,transparent 70%)}
+.floating-pill{position:absolute;background:rgba(255,255,255,.8);backdrop-filter:blur(10px);border:1px solid rgba(212,132,90,.15);border-radius:100px;font-size:.65rem;font-weight:500;color:var(--mid-br);padding:.35rem .85rem;animation:floatPill 6s ease-in-out infinite}
+.pill-1{top:18%;left:6%;animation-delay:0s}.pill-2{top:75%;left:10%;animation-delay:2s}.pill-3{top:22%;right:44%;animation-delay:4s}
+@keyframes floatPill{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.hero-content{position:relative;z-index:2;max-width:52%}
+.hero-badge{display:inline-flex;align-items:center;gap:.4rem;background:rgba(212,132,90,.1);border:1px solid rgba(212,132,90,.2);border-radius:100px;padding:.3rem .85rem;font-size:.64rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--warm);margin-bottom:.9rem}
+.hero-badge .dot{width:5px;height:5px;background:var(--warm);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,4.4rem);font-weight:400;line-height:1.07;color:var(--td);margin-bottom:.8rem}
+.hero-title em{font-style:italic;color:var(--warm)}
+.hero-desc{font-size:.84rem;line-height:1.72;color:var(--tm);max-width:400px;margin-bottom:1rem}
+.hero-conditions{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1.2rem}
+.cond-tag{font-size:.63rem;padding:.25rem .7rem;border-radius:100px;border:1px solid var(--sand);color:var(--tl);transition:all .3s;cursor:none}
+.cond-tag:hover{border-color:var(--warm);color:var(--warm)}
+.hero-actions{display:flex;gap:.8rem;align-items:center;margin-bottom:1.6rem}
+.btn-primary{background:var(--warm);color:#fff;padding:.72rem 1.7rem;border-radius:100px;font-size:.78rem;font-weight:500;border:none;cursor:none;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;transition:background .3s,transform .2s,box-shadow .3s;box-shadow:0 6px 18px rgba(212,132,90,.28)}
+.btn-primary:hover{background:var(--mid-br);transform:translateY(-2px)}
+.btn-secondary{color:var(--td);font-size:.78rem;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;transition:gap .3s,color .3s}
+.btn-secondary:hover{color:var(--warm);gap:.75rem}
+.btn-secondary .arrow{width:28px;height:28px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:.7rem;transition:background .3s,color .3s}
+.btn-secondary:hover .arrow{background:var(--warm);border-color:var(--warm);color:#fff}
+.hero-stats{display:flex;gap:1.5rem}
+.stat-item{display:flex;flex-direction:column}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:500;color:var(--td);line-height:1}
+.stat-label{font-size:.63rem;color:var(--tl);margin-top:.18rem}
+.stat-divider{width:1px;background:var(--sand)}
+.hero-accred{display:flex;gap:.9rem;margin-top:1.1rem;flex-wrap:wrap}
+.accred-item{font-size:.62rem;color:var(--tl);display:flex;align-items:center;gap:.3rem}
+.accred-dot{width:3px;height:3px;background:var(--sand);border-radius:50%}
+
+/* HERO IMAGE */
+.hero-image-wrap{position:absolute;right:0;top:0;width:46%;height:100%;overflow:hidden}
+.hero-img-overlay{position:absolute;left:0;top:0;width:38%;height:100%;background:linear-gradient(90deg,var(--cream),transparent);z-index:2}
+.hero-img-container{width:100%;height:100%;position:relative}
+.hero-img-badge{position:absolute;bottom:12%;right:6%;background:#fff;border-radius:15px;padding:.9rem 1.2rem;box-shadow:0 16px 40px rgba(44,24,16,.12);z-index:3;min-width:165px}
+.badge-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.38rem}
+.badge-icon{width:30px;height:30px;background:var(--blush);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem}
+.badge-title{font-size:.68rem;font-weight:500;color:var(--td)}.badge-sub{font-size:.58rem;color:var(--tl)}
+.rating-row{display:flex;align-items:center;gap:.35rem;margin-top:.3rem}
+.stars{color:#F5A623;font-size:.64rem;letter-spacing:1px}.rating-text{font-size:.58rem;color:var(--tl)}
+.hero-award-badge{position:absolute;top:18%;left:4%;background:#fff;border-radius:12px;padding:.75rem .95rem;box-shadow:0 10px 24px rgba(44,24,16,.1);z-index:3;text-align:center}
+.award-icon{font-size:1.2rem;display:block;margin-bottom:.22rem}.award-text{font-size:.58rem;color:var(--tl);line-height:1.4}
+
+/* SECTION */
+section{padding:2.8rem 4%}
+.section-tag{display:inline-flex;align-items:center;gap:.4rem;font-size:.64rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--warm);margin-bottom:.4rem}
+.section-tag::before{content:'';width:15px;height:1px;background:var(--warm)}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,3vw,2.5rem);font-weight:400;line-height:1.13;color:var(--td);margin-bottom:.4rem}
+.section-title em{font-style:italic;color:var(--warm)}
+.section-sub{font-size:.8rem;color:var(--tl);line-height:1.68;max-width:420px}
+
+/* MARQUEE */
+.marquee-section{background:var(--warm);padding:.6rem 0;overflow:hidden}
+.marquee-track{display:flex;white-space:nowrap;animation:marquee 28s linear infinite}
+.marquee-item{display:inline-flex;align-items:center;gap:1rem;padding:0 2rem;font-size:.68rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.82)}
+.marquee-item .sep{color:rgba(255,255,255,.32)}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* SERVICES */
+#services{background:var(--beige);border-radius:28px 28px 0 0;padding-bottom:2.8rem}
+.services-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:1.5rem;gap:1.5rem;flex-wrap:wrap}
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+.service-card{background:rgba(255,255,255,.8);border-radius:16px;padding:1.4rem 1.3rem;border:1px solid rgba(255,255,255,.85);transition:transform .35s,box-shadow .35s;position:relative;overflow:hidden;cursor:none}
+.service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--warm),var(--blush));transform:scaleX(0);transform-origin:left;transition:transform .35s}
+.service-card:hover{transform:translateY(-4px);box-shadow:0 14px 36px rgba(44,24,16,.1)}.service-card:hover::before{transform:scaleX(1)}
+.service-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--blush),rgba(212,132,90,.15));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:.8rem}
+.service-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:500;color:var(--td);margin-bottom:.3rem}
+.service-desc{font-size:.75rem;color:var(--tl);line-height:1.62;margin-bottom:.6rem}
+.service-tags{display:flex;flex-wrap:wrap;gap:.28rem;margin-bottom:.7rem}
+.s-tag{font-size:.58rem;padding:.18rem .52rem;border-radius:100px;background:rgba(212,132,90,.1);color:var(--warm)}
+.service-link{font-size:.67rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--warm);text-decoration:none;display:inline-flex;align-items:center;gap:.35rem;transition:gap .3s}
+.service-link:hover{gap:.6rem}
+
+/* WHY */
+#why{background:var(--cream);padding:2.5rem 4%}
+.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-top:1.4rem}
+.why-card{background:#fff;border-radius:14px;padding:1.2rem 1.1rem;border:1px solid var(--sand);transition:box-shadow .3s,transform .3s;cursor:none}
+.why-card:hover{transform:translateY(-3px);box-shadow:0 9px 22px rgba(44,24,16,.07)}
+.why-icon{font-size:1.35rem;margin-bottom:.55rem;display:block}
+.why-title{font-family:'Cormorant Garamond',serif;font-size:.98rem;font-weight:500;color:var(--td);margin-bottom:.28rem}
+.why-text{font-size:.73rem;color:var(--tl);line-height:1.6}
+
+/* ABOUT */
+#about{background:var(--cream);display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:start;padding:2.8rem 4%}
+.about-image-wrap{position:relative;padding-bottom:1.5rem}
+.about-img-main{width:100%;border-radius:20px;overflow:hidden;aspect-ratio:3/4;position:relative}
+.about-badge-float{position:absolute;bottom:0;right:-14px;background:#fff;border-radius:14px;padding:1rem;box-shadow:0 16px 40px rgba(44,24,16,.12);text-align:center;min-width:130px}
+.badge-big-num{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:500;color:var(--warm);line-height:1}
+.badge-big-label{font-size:.62rem;color:var(--tl);margin-top:.18rem;line-height:1.4}
+.credentials-grid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin:.9rem 0}
+.cred-item{background:var(--beige);border-radius:10px;padding:.75rem .85rem;display:flex;align-items:flex-start;gap:.5rem}
+.cred-ic{font-size:.88rem;margin-top:.06rem;flex-shrink:0}
+.cred-text{font-size:.7rem;line-height:1.5;color:var(--tm)}
+.cred-text strong{display:block;font-weight:500;color:var(--td);font-size:.72rem;margin-bottom:.1rem}
+.experience-bar{display:flex;flex-direction:column;gap:.55rem;margin:.9rem 0}
+.exp-item{display:flex;flex-direction:column;gap:.28rem}
+.exp-header{display:flex;justify-content:space-between;font-size:.7rem;color:var(--tm)}
+.exp-track{height:3.5px;background:var(--sand);border-radius:100px;overflow:hidden}
+.exp-fill{height:100%;background:linear-gradient(90deg,var(--warm),var(--blush));border-radius:100px;width:0;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
+.achievements{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-top:.9rem}
+.achievement{background:var(--beige);border-radius:11px;padding:.85rem;text-align:center}
+.ach-num{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:500;color:var(--td)}
+.ach-label{font-size:.6rem;color:var(--tl);margin-top:.12rem}
+
+/* PROCESS */
+#process{background:var(--deep);border-radius:28px;margin:0 2%;padding:2.8rem 4%}
+#process .section-tag{color:var(--blush)}#process .section-tag::before{background:var(--blush)}
+#process .section-title{color:#fff}#process .section-sub{color:rgba(255,255,255,.42);max-width:500px}
+.process-header{display:flex;justify-content:space-between;align-items:flex-end;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.8rem}
+.process-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem}
+.step-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:15px;padding:1.4rem 1.1rem;text-align:center;transition:background .35s,border-color .35s,transform .35s;cursor:none}
+.step-card:hover{background:rgba(212,132,90,.14);border-color:rgba(212,132,90,.28);transform:translateY(-3px)}
+.step-num{font-family:'Cormorant Garamond',serif;font-size:.67rem;color:rgba(212,132,90,.6);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.6rem}
+.step-icon-wrap{width:48px;height:48px;background:rgba(212,132,90,.13);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin:0 auto .8rem;border:1px solid rgba(212,132,90,.18)}
+.step-title{font-family:'Cormorant Garamond',serif;font-size:.98rem;font-weight:500;color:#fff;margin-bottom:.38rem}
+.step-desc{font-size:.71rem;color:rgba(255,255,255,.4);line-height:1.6}
+.step-detail{margin-top:.6rem;display:flex;flex-direction:column;gap:.24rem}
+.step-detail-item{font-size:.63rem;color:rgba(212,132,90,.6);display:flex;align-items:center;gap:.3rem;justify-content:center}
+.step-detail-item::before{content:'✓';font-size:.55rem}
+
+/* TECH */
+#tech{background:var(--beige);padding:2.5rem 4%}
+.tech-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.3rem;gap:.8rem;flex-wrap:wrap}
+.tech-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.7rem}
+.tech-item{background:#fff;border-radius:11px;padding:.95rem .65rem;text-align:center;border:1px solid var(--sand);transition:transform .3s,box-shadow .3s;cursor:none}
+.tech-item:hover{transform:translateY(-2px);box-shadow:0 6px 15px rgba(44,24,16,.07)}
+.tech-icon{font-size:1.3rem;display:block;margin-bottom:.38rem}
+.tech-name{font-size:.63rem;font-weight:500;color:var(--td);margin-bottom:.13rem}
+.tech-desc{font-size:.56rem;color:var(--tl);line-height:1.35}
+
+/* GALLERY */
+#gallery{background:var(--cream);padding:2.8rem 4%}
+.gallery-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:1.3rem;flex-wrap:wrap;gap:.9rem}
+.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+.gallery-card{border-radius:15px;overflow:hidden;position:relative;aspect-ratio:4/5;cursor:none}
+.gallery-card-wide{grid-column:span 2;aspect-ratio:8/5}
+.gallery-before-after{display:grid;grid-template-columns:1fr 1fr;height:100%;gap:2px}
+.ba-side{position:relative;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;padding-bottom:.75rem}
+.ba-side .bg-img{position:absolute;inset:0;transition:transform .5s}
+.gallery-card:hover .bg-img{transform:scale(1.04)}
+.ba-label{position:relative;z-index:2;background:rgba(255,255,255,.88);font-size:.56rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--td);padding:.22rem .58rem;border-radius:100px}
+.gallery-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(44,24,16,.72) 100%);z-index:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;padding:1rem;opacity:0;transition:opacity .4s}
+.gallery-card:hover .gallery-overlay{opacity:1}
+.gallery-overlay-text{font-size:.75rem;font-weight:500;color:#fff;margin-bottom:.22rem}
+.gallery-overlay-sub{font-size:.62rem;color:rgba(255,255,255,.62)}
+.gallery-tag{position:absolute;top:.7rem;left:.7rem;background:rgba(255,255,255,.92);font-size:.58rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--warm);padding:.22rem .65rem;border-radius:100px;z-index:3}
+
+/* TIPS */
+#tips{background:var(--beige);border-radius:28px;margin:0 2%;padding:2.8rem 4%}
+.tips-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:.8rem;margin-top:1.5rem}
+.tip-main{background:var(--warm);border-radius:16px;padding:1.6rem;color:#fff;grid-row:span 2;display:flex;flex-direction:column;justify-content:space-between}
+.tip-main .tip-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:400;line-height:1.22;margin-bottom:.7rem}
+.tip-main .tip-body{font-size:.76rem;line-height:1.7;opacity:.88;flex:1}
+.tip-main .tip-num{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:400;opacity:.15;line-height:1;text-align:right;margin-top:.6rem}
+.tip-card{background:#fff;border-radius:14px;padding:1.15rem;border:1px solid var(--sand);transition:transform .3s,box-shadow .3s;cursor:none}
+.tip-card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(44,24,16,.07)}
+.tip-icon{font-size:1.15rem;margin-bottom:.45rem;display:block}
+.tip-card-title{font-family:'Cormorant Garamond',serif;font-size:.92rem;font-weight:500;color:var(--td);margin-bottom:.3rem}
+.tip-card-text{font-size:.72rem;color:var(--tl);line-height:1.6}
+
+/* TESTIMONIALS */
+#testimonials{background:var(--cream);padding:2.8rem 4%}
+.testimonials-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:1.4rem;flex-wrap:wrap;gap:.9rem}
+.testimonials-track{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+.testimonial-card{background:#fff;border-radius:18px;padding:1.5rem;position:relative;overflow:hidden;transition:transform .35s,box-shadow .35s;cursor:none;border:1px solid rgba(229,213,192,.5)}
+.testimonial-card:hover{transform:translateY(-3px);box-shadow:0 11px 28px rgba(44,24,16,.08)}
+.testimonial-card.featured{background:var(--warm);color:#fff;border-color:transparent}
+.quote-icon{font-family:'Cormorant Garamond',serif;font-size:3rem;line-height:1;color:rgba(212,132,90,.13);position:absolute;top:.6rem;right:1rem;font-style:italic}
+.testimonial-card.featured .quote-icon{color:rgba(255,255,255,.13)}
+.test-stars{color:#F5A623;font-size:.7rem;letter-spacing:2px;margin-bottom:.6rem}
+.testimonial-card.featured .test-stars{color:#FFD700}
+.test-text{font-size:.79rem;line-height:1.72;color:var(--tm);font-style:italic;margin-bottom:.9rem}
+.testimonial-card.featured .test-text{color:rgba(255,255,255,.9)}
+.test-treatment{font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;color:var(--warm);margin-bottom:.7rem;font-weight:500}
+.testimonial-card.featured .test-treatment{color:rgba(255,255,255,.6)}
+.test-author{display:flex;align-items:center;gap:.65rem}
+.test-avatar{width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0}
+.avatar-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:.82rem;color:#fff;border-radius:50%}
+.test-name{font-size:.74rem;font-weight:500;color:var(--td)}.test-role{font-size:.6rem;color:var(--tl)}
+.testimonial-card.featured .test-name{color:#fff}.testimonial-card.featured .test-role{color:rgba(255,255,255,.6)}
+.trust-bar{display:flex;justify-content:center;gap:2rem;margin-top:1.4rem;flex-wrap:wrap;padding:1.1rem;background:var(--beige);border-radius:14px}
+.trust-item{display:flex;align-items:center;gap:.4rem;font-size:.7rem;color:var(--tm)}
+
+/* FAQ */
+#faq{background:var(--beige);border-radius:28px;margin:0 2%;padding:2.8rem 4%}
+.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:1.5rem}
+.faq-item{background:#fff;border-radius:13px;padding:1.1rem 1.3rem;border:1px solid var(--sand);cursor:none;transition:box-shadow .3s}
+.faq-item:hover{box-shadow:0 7px 18px rgba(44,24,16,.07)}
+.faq-q{font-family:'Cormorant Garamond',serif;font-size:.96rem;font-weight:500;color:var(--td);margin-bottom:.38rem;display:flex;justify-content:space-between;align-items:flex-start;gap:.7rem}
+.faq-ic{color:var(--warm);font-size:.82rem;flex-shrink:0;margin-top:.1rem}
+.faq-a{font-size:.73rem;color:var(--tl);line-height:1.65}
+
+/* BOOKING */
+#booking{background:var(--cream);display:grid;grid-template-columns:1fr 1.2fr;gap:3rem;align-items:start;padding:2.8rem 4%}
+.booking-info h2{font-family:'Cormorant Garamond',serif;font-size:clamp(1.5rem,2.6vw,2.2rem);font-weight:400;color:var(--td);line-height:1.18;margin:.35rem 0 .6rem}
+.booking-info h2 em{font-style:italic;color:var(--warm)}
+.booking-perks{display:flex;flex-direction:column;gap:.5rem;margin-top:1.1rem}
+.perk{display:flex;align-items:center;gap:.65rem;font-size:.77rem;color:var(--tm)}
+.perk-icon{width:26px;height:26px;background:rgba(212,132,90,.1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.78rem;flex-shrink:0}
+.clinic-strip{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.3rem;padding:1.1rem;background:var(--beige);border-radius:13px}
+.ci-item{display:flex;flex-direction:column;gap:.15rem}
+.ci-label{font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;color:var(--tl)}
+.ci-val{font-size:.78rem;font-weight:500;color:var(--td)}
+.ci-sep{width:1px;background:var(--sand)}
+.booking-form{background:#fff;border-radius:20px;padding:1.8rem;box-shadow:0 16px 46px rgba(44,24,16,.07)}
+.form-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:500;color:var(--td);margin-bottom:1.2rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.form-group{display:flex;flex-direction:column;gap:.28rem;margin-bottom:.75rem}
+.form-group.full{grid-column:span 2}
+label{font-size:.62rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--tl)}
+input,select,textarea{width:100%;padding:.62rem .85rem;border:1.5px solid var(--sand);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--td);background:var(--cream);outline:none;transition:border-color .3s,box-shadow .3s;cursor:none}
+input:focus,select:focus,textarea:focus{border-color:var(--warm);box-shadow:0 0 0 3px rgba(212,132,90,.1)}
+textarea{resize:vertical;min-height:70px}
+.form-submit{width:100%;background:var(--warm);color:#fff;border:none;padding:.82rem;border-radius:100px;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;cursor:none;transition:background .3s,transform .2s;box-shadow:0 6px 18px rgba(212,132,90,.28);margin-top:.3rem}
+.form-submit:hover{background:var(--mid-br);transform:translateY(-2px)}
+.form-note{font-size:.62rem;color:var(--tl);text-align:center;margin-top:.5rem}
+
+/* LOCATION */
+#location{background:var(--deep);border-radius:28px 28px 0 0;padding:2.8rem 4%;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.location-info{color:rgba(255,255,255,.65)}
+.location-info h3{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:400;color:#fff;margin:.35rem 0 .8rem}
+.loc-detail{display:flex;align-items:flex-start;gap:.6rem;margin-bottom:.65rem;font-size:.77rem;line-height:1.52}
+.loc-ic{font-size:.88rem;margin-top:.08rem;flex-shrink:0}
+.map-placeholder{background:rgba(255,255,255,.05);border-radius:16px;height:220px;border:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.65rem;color:rgba(255,255,255,.28);font-size:.75rem;letter-spacing:.06em}
+.map-placeholder .map-ic{font-size:2rem}
+
+/* FOOTER */
+footer{background:var(--deep);border-top:1px solid rgba(255,255,255,.05);padding:2.2rem 4% 1.4rem;color:rgba(255,255,255,.52)}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:2rem;margin-bottom:1.8rem}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.38rem;font-weight:600;color:#fff;text-decoration:none;display:block;margin-bottom:.6rem}
+.footer-logo span{color:var(--blush)}
+.footer-tagline{font-size:.73rem;line-height:1.65;margin-bottom:1rem}
+.social-links{display:flex;gap:.55rem}
+.social-btn{width:30px;height:30px;background:rgba(255,255,255,.07);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:rgba(255,255,255,.52);text-decoration:none;transition:background .3s,color .3s,transform .3s;cursor:none}
+.social-btn:hover{background:var(--warm);color:#fff;transform:translateY(-2px)}
+.footer-col h4{font-size:.63rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:#fff;margin-bottom:.8rem}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+.footer-links a{font-size:.73rem;color:rgba(255,255,255,.42);text-decoration:none;transition:color .3s}
+.footer-links a:hover{color:var(--blush)}
+.contact-item{display:flex;gap:.5rem;font-size:.73rem;margin-bottom:.55rem;align-items:flex-start;line-height:1.48}
+.contact-item .ic{font-size:.82rem;margin-top:1px}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:1rem;display:flex;justify-content:space-between;align-items:center;font-size:.65rem;flex-wrap:wrap;gap:.65rem}
+.footer-bottom-links{display:flex;gap:1.1rem}
+.footer-bottom-links a{color:rgba(255,255,255,.28);text-decoration:none;transition:color .3s}
+.footer-bottom-links a:hover{color:var(--blush)}
+
+/* ANIM STATES */
+.reveal{opacity:0;transform:translateY(30px)}
+.reveal-left{opacity:0;transform:translateX(-40px)}
+.reveal-right{opacity:0;transform:translateX(40px)}
+.scale-in{opacity:0;transform:scale(.9)}
+
+/* RESPONSIVE */
+@media(max-width:1100px){
+  .services-grid{grid-template-columns:repeat(2,1fr)}
+  .process-steps{grid-template-columns:repeat(2,1fr)}
+  #about{grid-template-columns:1fr;gap:2rem}.about-badge-float{right:0}
+  #booking{grid-template-columns:1fr;gap:1.8rem}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:1.5rem}
+  .tech-grid{grid-template-columns:repeat(3,1fr)}
+  .tips-grid{grid-template-columns:1fr 1fr}.tip-main{grid-row:span 1}
+  #location{grid-template-columns:1fr;gap:1.8rem}
+}
+@media(max-width:768px){
+  nav .nav-links{display:none}.hamburger{display:flex}
+  .hero-content{max-width:100%}.hero-image-wrap{display:none}
+  .why-grid{grid-template-columns:1fr 1fr}
+  .services-grid,.testimonials-track{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:1fr}.gallery-card-wide{grid-column:span 1}
+  .form-row{grid-template-columns:1fr}.form-group.full{grid-column:span 1}
+  .footer-grid{grid-template-columns:1fr}
+  .footer-bottom{flex-direction:column;text-align:center}
+  #process,#tips,#faq{margin:0;border-radius:18px}
+  .tech-grid{grid-template-columns:repeat(2,1fr)}
+  .tips-grid{grid-template-columns:1fr}
+  .faq-grid{grid-template-columns:1fr}
+  .credentials-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
 <body>
 
-<h1>Clinic Website Demo</h1>
-<p>This is my clinic demo website.</p>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="scroll-progress" id="scrollProgress"></div>
 
+<div class="mob-menu" id="mobMenu">
+  <span class="mob-close" id="mobClose">✕</span>
+  <a href="#hero" onclick="closeMenu()">Home</a>
+  <a href="#services" onclick="closeMenu()">Services</a>
+  <a href="#about" onclick="closeMenu()">About</a>
+  <a href="#testimonials" onclick="closeMenu()">Testimonials</a>
+  <a href="#faq" onclick="closeMenu()">FAQ</a>
+  <a href="#booking" onclick="closeMenu()" class="btn-primary">Book Appointment</a>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="logo">Derm<span>Lux</span></a>
+  <ul class="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#testimonials">Testimonials</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#booking" class="nav-cta">Book Appointment</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="floating-pill pill-1">✨ FDA Approved Treatments</div>
+  <div class="floating-pill pill-2">🏆 Best Dermatology Clinic 2024</div>
+  <div class="floating-pill pill-3">🔬 Advanced Laser Technology</div>
+
+  <div class="hero-content" id="heroContent">
+    <div class="hero-badge"><span class="dot"></span> Board-Certified Dermatology Specialists</div>
+    <h1 class="hero-title">Healthy Skin<br><em>Starts Here</em></h1>
+    <p class="hero-desc">World-class dermatological care where clinical precision meets compassion. Our board-certified specialists craft personalised plans that restore, protect and reveal your skin's true radiance.</p>
+    <div class="hero-conditions">
+      <span class="cond-tag">Acne &amp; Scarring</span><span class="cond-tag">Pigmentation</span><span class="cond-tag">Rosacea</span><span class="cond-tag">Eczema</span><span class="cond-tag">Laser Resurfacing</span><span class="cond-tag">Anti-Aging</span><span class="cond-tag">Mole Mapping</span><span class="cond-tag">Psoriasis</span>
+    </div>
+    <div class="hero-actions">
+      <a href="#booking" class="btn-primary">Book Free Consultation →</a>
+      <a href="#services" class="btn-secondary"><span class="arrow">▶</span> Our Treatments</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><span class="stat-num" id="s1">15K+</span><span class="stat-label">Patients Treated</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><span class="stat-num" id="s2">18+</span><span class="stat-label">Years Experience</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><span class="stat-num" id="s3">98%</span><span class="stat-label">Satisfaction Rate</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><span class="stat-num" id="s4">40+</span><span class="stat-label">Research Papers</span></div>
+    </div>
+    <div class="hero-accred">
+      <span class="accred-item">🏥 AAD Member</span><span class="accred-dot"></span>
+      <span class="accred-item">✅ CQC Registered</span><span class="accred-dot"></span>
+      <span class="accred-item">🔬 BACD Certified</span><span class="accred-dot"></span>
+      <span class="accred-item">🌟 ISO 9001:2015</span>
+    </div>
+  </div>
+
+  <div class="hero-image-wrap" id="heroImg">
+    <div class="hero-img-overlay"></div>
+    <div class="hero-img-container">
+      <svg viewBox="0 0 480 720" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;position:absolute;top:0;left:0">
+        <defs>
+          <linearGradient id="bgG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#F5E0CC"/><stop offset="100%" style="stop-color:#C07050"/></linearGradient>
+          <linearGradient id="coatG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#FFFFFF"/><stop offset="100%" style="stop-color:#F0E8E0"/></linearGradient>
+          <linearGradient id="skinG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#EDD5C0"/><stop offset="100%" style="stop-color:#D4A888"/></linearGradient>
+        </defs>
+        <rect width="480" height="720" fill="url(#bgG)"/>
+        <circle cx="380" cy="100" r="90" fill="rgba(255,255,255,0.07)"/>
+        <circle cx="60" cy="600" r="110" fill="rgba(255,255,255,0.05)"/>
+        <ellipse cx="240" cy="660" rx="190" ry="180" fill="url(#coatG)"/>
+        <path d="M 80 440 Q 60 400 75 365 Q 115 308 165 296 L 240 288 L 315 296 Q 365 308 405 365 Q 420 400 400 440 Z" fill="url(#coatG)"/>
+        <path d="M 215 310 L 228 368 L 240 392" stroke="rgba(210,195,185,0.6)" stroke-width="2" fill="none"/>
+        <path d="M 265 310 L 252 368 L 240 392" stroke="rgba(210,195,185,0.6)" stroke-width="2" fill="none"/>
+        <rect x="218" y="268" width="44" height="50" rx="9" fill="url(#skinG)"/>
+        <ellipse cx="240" cy="220" rx="74" ry="85" fill="url(#skinG)"/>
+        <ellipse cx="240" cy="154" rx="76" ry="50" fill="#4A2A18"/>
+        <ellipse cx="182" cy="204" rx="22" ry="58" fill="#4A2A18"/>
+        <ellipse cx="298" cy="204" rx="22" ry="58" fill="#4A2A18"/>
+        <rect x="198" y="210" width="36" height="24" rx="8" fill="none" stroke="#5C3A20" stroke-width="2.2"/>
+        <rect x="246" y="210" width="36" height="24" rx="8" fill="none" stroke="#5C3A20" stroke-width="2.2"/>
+        <line x1="234" y1="222" x2="246" y2="222" stroke="#5C3A20" stroke-width="2"/>
+        <line x1="183" y1="222" x2="198" y2="222" stroke="#5C3A20" stroke-width="2"/>
+        <line x1="282" y1="222" x2="297" y2="222" stroke="#5C3A20" stroke-width="2"/>
+        <ellipse cx="216" cy="222" rx="6" ry="4" fill="#3A2010" opacity="0.85"/>
+        <ellipse cx="264" cy="222" rx="6" ry="4" fill="#3A2010" opacity="0.85"/>
+        <path d="M 224 253 Q 240 268 256 253" stroke="#8B5A3C" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <path d="M 200 350 Q 192 410 208 433 Q 224 456 240 456 Q 256 456 272 433 Q 288 410 280 350" stroke="#9AA8BC" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+        <circle cx="240" cy="464" r="14" fill="#7A8898"/>
+        <circle cx="240" cy="464" r="7" fill="#5A6878"/>
+        <circle cx="200" cy="349" r="5" fill="#9AA8BC"/>
+        <circle cx="280" cy="349" r="5" fill="#9AA8BC"/>
+        <rect x="308" y="356" width="58" height="74" rx="8" fill="rgba(240,230,220,0.82)"/>
+        <rect x="316" y="348" width="42" height="12" rx="6" fill="#D4A888"/>
+        <rect x="118" y="360" width="68" height="38" rx="7" fill="white" opacity="0.9"/>
+        <line x1="128" y1="372" x2="178" y2="372" stroke="#D4845A" stroke-width="2"/>
+        <line x1="128" y1="381" x2="168" y2="381" stroke="#C0A090" stroke-width="1.2"/>
+        <line x1="128" y1="388" x2="172" y2="388" stroke="#C0A090" stroke-width="1.2"/>
+      </svg>
+    </div>
+    <div class="hero-img-badge">
+      <div class="badge-row"><div class="badge-icon">🏅</div><div><div class="badge-title">Dr. Sarah Mitchell</div><div class="badge-sub">MD, FAAD · Dermatologist</div></div></div>
+      <div class="rating-row"><span class="stars">★★★★★</span><span class="rating-text">4.9 · 2,400+ reviews</span></div>
+    </div>
+    <div class="hero-award-badge"><span class="award-icon">🥇</span><div class="award-text">Best Clinic<br>London 2024</div></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <span class="marquee-item">Acne Treatment <span class="sep">·</span></span><span class="marquee-item">Laser Therapy <span class="sep">·</span></span><span class="marquee-item">Skin Rejuvenation <span class="sep">·</span></span><span class="marquee-item">Anti-Aging <span class="sep">·</span></span><span class="marquee-item">Cosmetic Dermatology <span class="sep">·</span></span><span class="marquee-item">Mole Mapping <span class="sep">·</span></span><span class="marquee-item">Chemical Peels <span class="sep">·</span></span><span class="marquee-item">PRP Therapy <span class="sep">·</span></span><span class="marquee-item">Botox &amp; Fillers <span class="sep">·</span></span><span class="marquee-item">Eczema Care <span class="sep">·</span></span>
+    <span class="marquee-item">Acne Treatment <span class="sep">·</span></span><span class="marquee-item">Laser Therapy <span class="sep">·</span></span><span class="marquee-item">Skin Rejuvenation <span class="sep">·</span></span><span class="marquee-item">Anti-Aging <span class="sep">·</span></span><span class="marquee-item">Cosmetic Dermatology <span class="sep">·</span></span><span class="marquee-item">Mole Mapping <span class="sep">·</span></span><span class="marquee-item">Chemical Peels <span class="sep">·</span></span><span class="marquee-item">PRP Therapy <span class="sep">·</span></span><span class="marquee-item">Botox &amp; Fillers <span class="sep">·</span></span><span class="marquee-item">Eczema Care <span class="sep">·</span></span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-header">
+    <div><div class="section-tag">What We Offer</div><h2 class="section-title">Advanced <em>Skin Treatments</em><br>For Every Concern</h2></div>
+    <p class="section-sub">Evidence-based, FDA-approved treatments personalised for your unique skin biology — from clinical diagnosis to cosmetic enhancement.</p>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <div class="service-icon">🫧</div>
+      <div class="service-name">Acne Treatment</div>
+      <p class="service-desc">Multi-modal protocol combining topical retinoids, oral antibiotics, hormonal therapy, blue-light phototherapy, chemical peels, and fractional laser resurfacing for all grades of acne including nodulo-cystic forms and post-acne scarring.</p>
+      <div class="service-tags"><span class="s-tag">Comedonal</span><span class="s-tag">Cystic Acne</span><span class="s-tag">Scarring</span><span class="s-tag">Hormonal</span></div>
+      <a href="#booking" class="service-link">Explore Treatment →</a>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">✨</div>
+      <div class="service-name">Laser Therapy</div>
+      <p class="service-desc">Medical-grade laser suite including fractional CO₂ for resurfacing, Nd:YAG for vascular lesions and hair removal, Q-switched for pigmentation and tattoo removal, and IPL photorejuvenation — all calibrated to your Fitzpatrick skin type.</p>
+      <div class="service-tags"><span class="s-tag">CO₂ Fractional</span><span class="s-tag">Nd:YAG</span><span class="s-tag">IPL</span><span class="s-tag">Q-Switch</span></div>
+      <a href="#booking" class="service-link">Explore Treatment →</a>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">🌿</div>
+      <div class="service-name">Skin Rejuvenation</div>
+      <p class="service-desc">Restore youthful vitality with HydraFacial MD, oxygen infusion facials, TCA and glycolic acid peels, micro-needling with growth factor serums, and bio-revitalisation injections strategically layered to stimulate collagen and luminosity.</p>
+      <div class="service-tags"><span class="s-tag">HydraFacial</span><span class="s-tag">TCA Peel</span><span class="s-tag">Microneedling</span><span class="s-tag">Biostimulators</span></div>
+      <a href="#booking" class="service-link">Explore Treatment →</a>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">⏳</div>
+      <div class="service-name">Anti-Aging</div>
+      <p class="service-desc">Science-first approach combining botulinum toxin type A (Botox/Dysport), hyaluronic acid dermal fillers, Profhilo bioremodelling, thread lifts and Ultherapy HIFU to non-surgically lift, volumise and tighten skin. Results last 6–24 months.</p>
+      <div class="service-tags"><span class="s-tag">Botox</span><span class="s-tag">Fillers</span><span class="s-tag">Profhilo</span><span class="s-tag">HIFU Lift</span></div>
+      <a href="#booking" class="service-link">Explore Treatment →</a>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">💎</div>
+      <div class="service-name">Cosmetic Dermatology</div>
+      <p class="service-desc">Comprehensive aesthetic services including lip augmentation, non-surgical rhinoplasty, jawline contouring, tear trough filler for under-eye hollows, and brow lifting. All using CE-marked, FDA-cleared products by specialist-grade practitioners.</p>
+      <div class="service-tags"><span class="s-tag">Lip Augmentation</span><span class="s-tag">Contouring</span><span class="s-tag">Tear Trough</span><span class="s-tag">Brow Lift</span></div>
+      <a href="#booking" class="service-link">Explore Treatment →</a>
+    </div>
+    <div class="service-card reveal">
+      <div class="service-icon">🔬</div>
+      <div class="service-name">Clinical Diagnosis</div>
+      <p class="service-desc">Full dermatological assessment: mole mapping with FotoFinder ATBM dermoscopy, patch testing for allergens, skin biopsy, psoriasis and eczema management, rosacea protocols, and specialist referral for skin cancers. Written care plan included.</p>
+      <div class="service-tags"><span class="s-tag">Mole Mapping</span><span class="s-tag">Patch Testing</span><span class="s-tag">Eczema</span><span class="s-tag">Psoriasis</span></div>
+      <a href="#booking" class="service-link">Explore Treatment →</a>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section id="why">
+  <div class="section-tag reveal">Why Choose DermLux</div>
+  <h2 class="section-title reveal">The Standard of Care You <em>Deserve</em></h2>
+  <div class="why-grid">
+    <div class="why-card reveal"><span class="why-icon">🏥</span><div class="why-title">Clinical-Grade Facilities</div><p class="why-text">Our 5,000 sq ft clinic has medical-grade laser suites, sterile procedure rooms, and dedicated consultation areas meeting CQC standards throughout every visit.</p></div>
+    <div class="why-card reveal"><span class="why-icon">🧬</span><div class="why-title">Evidence-Based Protocols</div><p class="why-text">Every treatment plan is rooted in peer-reviewed research. We follow NICE, AAD and BAD consensus guidelines and publish our own clinical studies.</p></div>
+    <div class="why-card reveal"><span class="why-icon">🎯</span><div class="why-title">Personalised Skincare Plans</div><p class="why-text">AI-assisted VISIA skin analysis, patch testing and thorough medical history combine to build a bespoke treatment roadmap unique to your biology and goals.</p></div>
+    <div class="why-card reveal"><span class="why-icon">🤝</span><div class="why-title">Ongoing Support &amp; Care</div><p class="why-text">Our patient portal gives you access to records, progress photos, prescription reviews and direct messaging with your dermatologist between appointments.</p></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-image-wrap reveal-left">
+    <div class="about-img-main">
+      <svg viewBox="0 0 380 510" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <defs>
+          <linearGradient id="abBg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#F5E8D8"/><stop offset="100%" style="stop-color:#C07050"/></linearGradient>
+          <linearGradient id="abSk" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#EDD5C0"/><stop offset="100%" style="stop-color:#D4A888"/></linearGradient>
+          <linearGradient id="abCt" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#FFFFFF"/><stop offset="100%" style="stop-color:#EDE5DC"/></linearGradient>
+        </defs>
+        <rect width="380" height="510" fill="url(#abBg)"/>
+        <circle cx="300" cy="50" r="80" fill="rgba(255,255,255,0.07)"/>
+        <ellipse cx="190" cy="490" rx="175" ry="130" fill="url(#abCt)"/>
+        <path d="M 45 335 Q 30 300 45 270 Q 82 220 132 210 L 190 202 L 248 210 Q 298 220 335 270 Q 350 300 335 335 Z" fill="url(#abCt)"/>
+        <path d="M 170 220 L 183 265 L 190 280" stroke="rgba(210,195,185,0.6)" stroke-width="2" fill="none"/>
+        <path d="M 210 220 L 197 265 L 190 280" stroke="rgba(210,195,185,0.6)" stroke-width="2" fill="none"/>
+        <rect x="174" y="178" width="32" height="40" rx="8" fill="url(#abSk)"/>
+        <ellipse cx="190" cy="148" rx="60" ry="70" fill="url(#abSk)"/>
+        <ellipse cx="190" cy="100" rx="62" ry="40" fill="#3C2010"/>
+        <ellipse cx="142" cy="135" rx="18" ry="44" fill="#3C2010"/>
+        <ellipse cx="238" cy="135" rx="18" ry="44" fill="#3C2010"/>
+        <circle cx="215" cy="82" r="16" fill="#3C2010"/>
+        <rect x="154" y="143" width="30" height="20" rx="6" fill="none" stroke="#5C3A20" stroke-width="1.8" opacity="0.7"/>
+        <rect x="196" y="143" width="30" height="20" rx="6" fill="none" stroke="#5C3A20" stroke-width="1.8" opacity="0.7"/>
+        <line x1="184" y1="153" x2="196" y2="153" stroke="#5C3A20" stroke-width="1.6" opacity="0.7"/>
+        <ellipse cx="169" cy="153" rx="5" ry="4" fill="#3A2010" opacity="0.85"/>
+        <ellipse cx="211" cy="153" rx="5" ry="4" fill="#3A2010" opacity="0.85"/>
+        <path d="M 178 172 Q 190 182 202 172" stroke="#8B5A3C" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M 156 225 Q 149 278 162 296 Q 175 314 190 314 Q 205 314 218 296 Q 231 278 224 225" stroke="#9AA8BC" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <circle cx="190" cy="320" r="11" fill="#7A8898"/><circle cx="190" cy="320" r="6" fill="#5A6878"/>
+        <circle cx="156" cy="224" r="4" fill="#9AA8BC"/><circle cx="224" cy="224" r="4" fill="#9AA8BC"/>
+        <rect x="234" y="248" width="52" height="66" rx="8" fill="rgba(245,238,230,0.88)"/>
+        <rect x="241" y="241" width="37" height="11" rx="5" fill="#D4A888"/>
+        <line x1="242" y1="268" x2="278" y2="268" stroke="#C0A090" stroke-width="1.4" opacity="0.6"/>
+        <line x1="242" y1="277" x2="274" y2="277" stroke="#C0A090" stroke-width="1.4" opacity="0.6"/>
+        <line x1="242" y1="286" x2="276" y2="286" stroke="#C0A090" stroke-width="1.4" opacity="0.6"/>
+        <rect x="90" y="250" width="62" height="36" rx="7" fill="white" opacity="0.9"/>
+        <line x1="100" y1="262" x2="144" y2="262" stroke="#D4845A" stroke-width="2"/>
+        <line x1="100" y1="271" x2="140" y2="271" stroke="#C0A090" stroke-width="1.2"/>
+        <line x1="100" y1="278" x2="142" y2="278" stroke="#C0A090" stroke-width="1.2"/>
+      </svg>
+    </div>
+    <div class="about-badge-float"><div class="badge-big-num">18+</div><div class="badge-big-label">Years Clinical<br>Excellence</div></div>
+  </div>
+  <div class="reveal-right">
+    <div class="section-tag">Meet Your Doctor</div>
+    <h2 class="section-title">Dr. Sarah <em>Mitchell</em>, MD FAAD</h2>
+    <p style="font-size:.8rem;color:var(--tl);line-height:1.72;margin-bottom:.7rem">Fellow of the American Academy of Dermatology with dual board certification in Medical and Cosmetic Dermatology. Trained at Johns Hopkins School of Medicine with her fellowship at Harvard's Massachusetts General Hospital — bringing Ivy League expertise to every consultation.</p>
+    <p style="font-size:.8rem;color:var(--tl);line-height:1.72;margin-bottom:.8rem">Pioneer in combination laser therapies for pigmented skin, author of over 40 peer-reviewed publications, and international speaker at AAD, EADV and IMCAS congresses. Passionate about making advanced dermatology accessible to all skin tones.</p>
+    <div class="credentials-grid">
+      <div class="cred-item"><span class="cred-ic">🎓</span><div class="cred-text"><strong>MD — Johns Hopkins University</strong>School of Medicine, Dermatology residency</div></div>
+      <div class="cred-item"><span class="cred-ic">🏛️</span><div class="cred-text"><strong>Fellowship — Harvard MGH</strong>Cosmetic &amp; Laser Dermatology subspecialty</div></div>
+      <div class="cred-item"><span class="cred-ic">📋</span><div class="cred-text"><strong>FAAD, GMC Registered</strong>Dual board certified, CQC approved clinician</div></div>
+      <div class="cred-item"><span class="cred-ic">🔬</span><div class="cred-text"><strong>40+ Peer-Reviewed Papers</strong>Published in JAAD, EADV, British J. Dermatology</div></div>
+    </div>
+    <div class="experience-bar">
+      <div class="exp-item"><div class="exp-header"><span>Laser Dermatology &amp; Photomedicine</span><span>96%</span></div><div class="exp-track"><div class="exp-fill" data-width="96"></div></div></div>
+      <div class="exp-item"><div class="exp-header"><span>Cosmetic Injectables &amp; Aesthetics</span><span>92%</span></div><div class="exp-track"><div class="exp-fill" data-width="92"></div></div></div>
+      <div class="exp-item"><div class="exp-header"><span>Medical &amp; Paediatric Dermatology</span><span>98%</span></div><div class="exp-track"><div class="exp-fill" data-width="98"></div></div></div>
+    </div>
+    <div class="achievements">
+      <div class="achievement"><div class="ach-num">15K+</div><div class="ach-label">Patients Treated</div></div>
+      <div class="achievement"><div class="ach-num">40+</div><div class="ach-label">Publications</div></div>
+      <div class="achievement"><div class="ach-num">12</div><div class="ach-label">Industry Awards</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="process-header">
+    <div><div class="section-tag">How It Works</div><h2 class="section-title">Your Path to <em>Radiant Skin</em></h2></div>
+    <p class="section-sub">A medically supervised journey from first consultation to long-term skin wellness — every step designed around you.</p>
+  </div>
+  <div class="process-steps">
+    <div class="step-card reveal">
+      <div class="step-num">Step 01</div><div class="step-icon-wrap">🗓️</div>
+      <div class="step-title">Book Consultation</div>
+      <p class="step-desc">Schedule online 24/7 or by phone. New patients receive a comprehensive intake form beforehand so we prepare a focused, productive first session.</p>
+      <div class="step-detail"><span class="step-detail-item">Online or in-person booking</span><span class="step-detail-item">Same-week appointments</span><span class="step-detail-item">Free 15-min pre-call</span></div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">Step 02</div><div class="step-icon-wrap">🔍</div>
+      <div class="step-title">Skin Analysis</div>
+      <p class="step-desc">In-depth assessment using VISIA Complexion Analysis, FotoFinder dermoscopy, patch testing and full medical history to understand your skin at a cellular level.</p>
+      <div class="step-detail"><span class="step-detail-item">VISIA multispectral scan</span><span class="step-detail-item">Dermoscopic mole check</span><span class="step-detail-item">Fitzpatrick skin typing</span></div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">Step 03</div><div class="step-icon-wrap">💊</div>
+      <div class="step-title">Personalised Plan</div>
+      <p class="step-desc">Written, evidence-based roadmap combining in-clinic procedures, prescribed topicals and a home skincare regime — staged for maximum efficacy and minimal disruption.</p>
+      <div class="step-detail"><span class="step-detail-item">Written care protocol</span><span class="step-detail-item">Prescription skincare</span><span class="step-detail-item">Phased treatment schedule</span></div>
+    </div>
+    <div class="step-card reveal">
+      <div class="step-num">Step 04</div><div class="step-icon-wrap">🌟</div>
+      <div class="step-title">Ongoing Monitoring</div>
+      <p class="step-desc">Every 4–8 weeks we review progress with side-by-side photography, adjust treatments as your skin responds and provide direct access via our secure patient portal.</p>
+      <div class="step-detail"><span class="step-detail-item">Progress photo tracking</span><span class="step-detail-item">Plan refinement reviews</span><span class="step-detail-item">Patient portal messaging</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TECHNOLOGY -->
+<section id="tech">
+  <div class="tech-header">
+    <div><div class="section-tag">Our Technology</div><h2 class="section-title" style="font-size:clamp(1.4rem,2.2vw,1.9rem)">Medical-Grade <em>Equipment</em></h2></div>
+    <p style="font-size:.76rem;color:var(--tl);max-width:300px;line-height:1.62">FDA-cleared and CE-marked technology for treatments that are both safe and clinically proven to deliver results.</p>
+  </div>
+  <div class="tech-grid">
+    <div class="tech-item reveal"><span class="tech-icon">🔴</span><div class="tech-name">Fraxel CO₂</div><div class="tech-desc">Fractional resurfacing for scars &amp; texture</div></div>
+    <div class="tech-item reveal"><span class="tech-icon">💡</span><div class="tech-name">Lumenis M22</div><div class="tech-desc">IPL photorejuvenation system</div></div>
+    <div class="tech-item reveal"><span class="tech-icon">🌊</span><div class="tech-name">Ultherapy HIFU</div><div class="tech-desc">Non-surgical lifting &amp; tightening</div></div>
+    <div class="tech-item reveal"><span class="tech-icon">🔬</span><div class="tech-name">VISIA Analysis</div><div class="tech-desc">UV &amp; multispectral skin imaging</div></div>
+    <div class="tech-item reveal"><span class="tech-icon">💉</span><div class="tech-name">CoolSculpting Elite</div><div class="tech-desc">FDA fat-freezing body contouring</div></div>
+    <div class="tech-item reveal"><span class="tech-icon">⚡</span><div class="tech-name">PicoSure Pro</div><div class="tech-desc">Picosecond laser for pigmentation</div></div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="gallery-header">
+    <div><div class="section-tag">Results Gallery</div><h2 class="section-title">Real Patients, <em>Real Transformations</em></h2></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:.4rem">
+      <a href="#booking" class="btn-primary" style="font-size:.75rem;padding:.65rem 1.5rem">View All Cases</a>
+      <p style="font-size:.6rem;color:var(--tl);text-align:right">Individual outcomes may vary.</p>
+    </div>
+  </div>
+  <div class="gallery-grid">
+    <div class="gallery-card scale-in">
+      <div class="gallery-tag">Acne Clear Program</div>
+      <div class="gallery-before-after">
+        <div class="ba-side" style="background:linear-gradient(180deg,#C4886A,#9A6040)"><div class="bg-img" style="background:linear-gradient(180deg,#C4886A,#9A6040)"></div><span class="ba-label">Before</span></div>
+        <div class="ba-side" style="background:linear-gradient(180deg,#F5DBC8,#D4A888)"><div class="bg-img" style="background:linear-gradient(180deg,#F5DBC8,#D4A888)"></div><span class="ba-label">After</span></div>
+      </div>
+      <div class="gallery-overlay"><div class="gallery-overlay-text">8 Week Acne Protocol</div><div class="gallery-overlay-sub">Blue light + retinoid + peel</div></div>
+    </div>
+    <div class="gallery-card gallery-card-wide scale-in">
+      <div class="gallery-tag">CO₂ Fractional Laser</div>
+      <div class="gallery-before-after">
+        <div class="ba-side" style="flex:1"><div class="bg-img" style="background:linear-gradient(180deg,#B87850,#8B5530)"></div><span class="ba-label">Before</span></div>
+        <div class="ba-side" style="flex:1"><div class="bg-img" style="background:linear-gradient(180deg,#EDD0B5,#CCA080)"></div><span class="ba-label">After</span></div>
+      </div>
+      <div class="gallery-overlay"><div class="gallery-overlay-text">Fraxel CO₂ · 3 Sessions</div><div class="gallery-overlay-sub">Fine lines, texture &amp; enlarged pores</div></div>
+    </div>
+    <div class="gallery-card scale-in">
+      <div class="gallery-tag">Anti-Aging Protocol</div>
+      <div class="gallery-before-after">
+        <div class="ba-side" style="background:linear-gradient(180deg,#C09070,#956040)"><div class="bg-img" style="background:linear-gradient(180deg,#C09070,#956040)"></div><span class="ba-label">Before</span></div>
+        <div class="ba-side" style="background:linear-gradient(180deg,#F5E0C8,#DDB898)"><div class="bg-img" style="background:linear-gradient(180deg,#F5E0C8,#DDB898)"></div><span class="ba-label">After</span></div>
+      </div>
+      <div class="gallery-overlay"><div class="gallery-overlay-text">Profhilo + Botox Combo</div><div class="gallery-overlay-sub">Bioremodelling + line softening</div></div>
+    </div>
+    <div class="gallery-card scale-in">
+      <div class="gallery-tag">Pigmentation</div>
+      <div class="gallery-before-after">
+        <div class="ba-side" style="background:linear-gradient(180deg,#B08060,#806040)"><div class="bg-img" style="background:linear-gradient(180deg,#B08060,#806040)"></div><span class="ba-label">Before</span></div>
+        <div class="ba-side" style="background:linear-gradient(180deg,#EDD8C0,#CCAA88)"><div class="bg-img" style="background:linear-gradient(180deg,#EDD8C0,#CCAA88)"></div><span class="ba-label">After</span></div>
+      </div>
+      <div class="gallery-overlay"><div class="gallery-overlay-text">PicoSure + IPL · 4 Sessions</div><div class="gallery-overlay-sub">Melasma &amp; sunspot clearance</div></div>
+    </div>
+    <div class="gallery-card scale-in">
+      <div class="gallery-tag">Skin Rejuvenation</div>
+      <div class="gallery-before-after">
+        <div class="ba-side" style="background:linear-gradient(180deg,#A87860,#784838)"><div class="bg-img" style="background:linear-gradient(180deg,#A87860,#784838)"></div><span class="ba-label">Before</span></div>
+        <div class="ba-side" style="background:linear-gradient(180deg,#F0D8C0,#D0A888)"><div class="bg-img" style="background:linear-gradient(180deg,#F0D8C0,#D0A888)"></div><span class="ba-label">After</span></div>
+      </div>
+      <div class="gallery-overlay"><div class="gallery-overlay-text">HydraFacial + PRP Series</div><div class="gallery-overlay-sub">Dullness, dehydration &amp; tone corrected</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SKIN TIPS -->
+<section id="tips">
+  <div class="section-tag">Dermatologist Tips</div>
+  <h2 class="section-title">Expert Skincare <em>Advice</em></h2>
+  <div class="tips-grid">
+    <div class="tip-main reveal-left">
+      <div>
+        <div class="tip-title">Always Wear SPF 50+ — Even Indoors</div>
+        <div class="tip-body">UV radiation is the single greatest cause of premature skin aging and skin cancer. UVA rays penetrate glass and cloud cover year-round. Broad-spectrum SPF 50+ is the non-negotiable foundation of every skincare routine, reapplied every 2 hours outdoors. Pair with oral Polypodium leucotomos extract for added protection. This one habit prevents up to 80% of visible aging signs over a lifetime.</div>
+      </div>
+      <div class="tip-num">01</div>
+    </div>
+    <div class="tip-card reveal"><span class="tip-icon">🌙</span><div class="tip-card-title">Retinoids at Night</div><p class="tip-card-text">Topical retinoids (retinol, tretinoin, adapalene) are the most evidence-backed anti-aging active. Apply pea-sized amounts to clean, dry skin at night. Start 2× weekly, build to nightly over 8 weeks. Avoid during pregnancy — consult your dermatologist for safe alternatives.</p></div>
+    <div class="tip-card reveal"><span class="tip-icon">💧</span><div class="tip-card-title">Barrier Function First</div><p class="tip-card-text">A compromised barrier — redness, flaking, sensitivity — undermines every treatment you apply. Prioritise ceramide-rich moisturisers, gentle pH-balanced cleansers (pH 4.5–5.5), and avoid over-exfoliation. Rebuild the barrier before layering any active ingredients.</p></div>
+    <div class="tip-card reveal"><span class="tip-icon">🍊</span><div class="tip-card-title">Vitamin C in the Morning</div><p class="tip-card-text">L-ascorbic acid at 15–20% concentration neutralises free radicals, brightens post-inflammatory hyperpigmentation and potentiates your SPF up to 4×. Pair with ferulic acid for stability. Store in a dark, cool place and replace when it turns orange or yellow.</p></div>
+    <div class="tip-card reveal"><span class="tip-icon">🛌</span><div class="tip-card-title">Sleep &amp; Skin Repair</div><p class="tip-card-text">During deep sleep, growth hormone triggers peak collagen synthesis and cellular turnover. Chronic sleep deprivation raises cortisol, degrading collagen and aggravating acne and eczema. Aim for 7–9 hours on a silk pillowcase to reduce sleep-crease formation.</p></div>
+    <div class="tip-card reveal"><span class="tip-icon">🥗</span><div class="tip-card-title">Diet &amp; Skin Health</div><p class="tip-card-text">High glycaemic foods spike insulin and promote IGF-1, driving sebum and acne. An anti-inflammatory diet rich in omega-3s (salmon, walnuts) and antioxidants (berries, leafy greens), low in dairy, measurably improves acne and radiance within 10–12 weeks.</p></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="testimonials-header">
+    <div><div class="section-tag">Patient Stories</div><h2 class="section-title">What Our Patients Are <em>Saying</em></h2></div>
+    <p class="section-sub">Over 15,000 patients trust DermLux with their skin. Here are a few of their stories.</p>
+  </div>
+  <div class="testimonials-track">
+    <div class="testimonial-card reveal">
+      <span class="quote-icon">"</span>
+      <div class="test-stars">★★★★★</div>
+      <div class="test-treatment">Acne Treatment · 12 Weeks</div>
+      <p class="test-text">"After struggling with cystic acne for seven years, DermLux changed my life. Dr. Mitchell was the first doctor to listen properly, run the right tests and explain every decision. My skin hasn't looked this clear since I was a teenager."</p>
+      <div class="test-author"><div class="test-avatar"><div class="avatar-placeholder" style="background:linear-gradient(135deg,#D4845A,#F0A880)">A</div></div><div><div class="test-name">Amelia Chen, 28</div><div class="test-role">Software Engineer, London</div></div></div>
+    </div>
+    <div class="testimonial-card featured reveal">
+      <span class="quote-icon">"</span>
+      <div class="test-stars">★★★★★</div>
+      <div class="test-treatment">Laser Resurfacing + Anti-Aging</div>
+      <p class="test-text">"The results from my Fraxel CO₂ course are phenomenal. I'm 54 and people guess early 40s. Dr. Mitchell was honest about what laser could achieve — the combination with Profhilo was truly transformative. Exceptional aftercare throughout."</p>
+      <div class="test-author"><div class="test-avatar"><div class="avatar-placeholder" style="background:rgba(255,255,255,.3)">M</div></div><div><div class="test-name">Margaret Foster, 54</div><div class="test-role">Business Executive, Surrey</div></div></div>
+    </div>
+    <div class="testimonial-card reveal">
+      <span class="quote-icon">"</span>
+      <div class="test-stars">★★★★★</div>
+      <div class="test-treatment">Melasma · Pigmentation Protocol</div>
+      <p class="test-text">"I have Fitzpatrick IV skin and was terrified of laser after bad experiences elsewhere. Dr. Mitchell's expertise with pigmented skin is unmatched. My melasma has reduced over 80% after four sessions. I wish I'd found DermLux sooner."</p>
+      <div class="test-author"><div class="test-avatar"><div class="avatar-placeholder" style="background:linear-gradient(135deg,#8B5A3C,#C4845A)">P</div></div><div><div class="test-name">Priya Mehta, 37</div><div class="test-role">Pharmacist, Birmingham</div></div></div>
+    </div>
+  </div>
+  <div class="trust-bar">
+    <span class="trust-item"><span>🏥</span> AAD &amp; BAD Member</span>
+    <span class="trust-item"><span>✅</span> CQC Registered</span>
+    <span class="trust-item"><span>🔒</span> GDPR Compliant</span>
+    <span class="trust-item"><span>🌟</span> Best Clinic 2024</span>
+    <span class="trust-item"><span>💊</span> FDA &amp; CE Cleared Only</span>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-tag">FAQ</div>
+  <h2 class="section-title">Common Questions About <em>Your Skin</em></h2>
+  <div class="faq-grid">
+    <div class="faq-item reveal"><div class="faq-q">How many sessions will I need? <span class="faq-ic">＋</span></div><div class="faq-a">Acne protocols typically run 8–12 weeks. Laser resurfacing courses are 3–6 sessions spaced 4–6 weeks apart. Anti-aging injectables are repeated every 3–6 months. You'll receive a written treatment schedule at your consultation with realistic timelines and expected outcomes at each stage.</div></div>
+    <div class="faq-item reveal"><div class="faq-q">Are the treatments painful? <span class="faq-ic">＋</span></div><div class="faq-a">Most patients describe laser treatments as a mild warm snapping sensation. We apply topical anaesthetic 30–45 minutes beforehand. Injectables use ultra-fine needles and most contain lidocaine in the formula. Chemical peels produce mild tingling only. Patient comfort is always our priority.</div></div>
+    <div class="faq-item reveal"><div class="faq-q">What is the downtime after laser treatment? <span class="faq-ic">＋</span></div><div class="faq-a">Ablative fractional CO₂ involves 5–7 days of redness and peeling; most patients return to work by day 7 with mineral makeup. Non-ablative lasers and IPL have minimal to no downtime — mild pinkness for a few hours. We provide a written aftercare guide and recovery skincare kit with every laser treatment.</div></div>
+    <div class="faq-item reveal"><div class="faq-q">Is treatment safe for darker skin tones? <span class="faq-ic">＋</span></div><div class="faq-a">Absolutely. Dr. Mitchell specialises in Fitzpatrick types III–VI. We use PicoSure, long-pulsed Nd:YAG and calibrated IPL protocols proven safe for melanin-rich skin. We never use outdated technologies or one-size-fits-all settings — every parameter is personalised to your skin type.</div></div>
+    <div class="faq-item reveal"><div class="faq-q">Can I combine multiple treatments? <span class="faq-ic">＋</span></div><div class="faq-a">Yes — combination therapy often delivers superior results. We commonly pair fractional laser with PRP, botulinum toxin with skin-boosting injections, and chemical peels with microneedling. Your written plan will specify safe timing and sequencing for optimal outcomes.</div></div>
+    <div class="faq-item reveal"><div class="faq-q">Do you offer prescription skincare? <span class="faq-ic">＋</span></div><div class="faq-a">Yes. As a medical clinic we prescribe pharmaceutical-grade topicals unavailable over the counter — including tretinoin, oral antibiotics, azelaic acid 20%, and compounded formulations tailored to your needs. Prescriptions are reviewed at every follow-up and adjusted as your skin evolves.</div></div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section id="booking">
+  <div class="booking-info reveal-left">
+    <div class="section-tag">Get In Touch</div>
+    <h2>Book Your <em>Consultation</em> Today</h2>
+    <p style="font-size:.79rem;color:var(--tl);line-height:1.7;margin-bottom:.9rem">New patient consultations run 45–60 minutes and include a full VISIA skin analysis, written assessment and personalised treatment plan. We see patients 6 days a week at our Harley Street clinic.</p>
+    <div class="booking-perks">
+      <div class="perk"><div class="perk-icon">📅</div> Flexible scheduling Mon–Sat, 8am–8pm</div>
+      <div class="perk"><div class="perk-icon">💬</div> Complimentary 15-min pre-consultation call</div>
+      <div class="perk"><div class="perk-icon">🛡️</div> All records confidential &amp; GDPR compliant</div>
+      <div class="perk"><div class="perk-icon">🚇</div> 2 min from Great Portland Street tube</div>
+      <div class="perk"><div class="perk-icon">💳</div> 0% interest finance for treatment courses</div>
+      <div class="perk"><div class="perk-icon">🔬</div> Full VISIA skin analysis with every new consult</div>
+    </div>
+    <div class="clinic-strip">
+      <div class="ci-item"><div class="ci-label">Phone</div><div class="ci-val">+44 20 7946 0321</div></div>
+      <div class="ci-sep"></div>
+      <div class="ci-item"><div class="ci-label">Email</div><div class="ci-val">care@dermlux.com</div></div>
+      <div class="ci-sep"></div>
+      <div class="ci-item"><div class="ci-label">Hours</div><div class="ci-val">Mon–Sat 8am–8pm</div></div>
+    </div>
+  </div>
+  <div class="booking-form reveal-right">
+    <div class="form-title">Request an Appointment</div>
+    <div class="form-row">
+      <div class="form-group"><label>First Name</label><input type="text" placeholder="Sarah"></div>
+      <div class="form-group"><label>Last Name</label><input type="text" placeholder="Mitchell"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Email Address</label><input type="email" placeholder="sarah@email.com"></div>
+      <div class="form-group"><label>Phone Number</label><input type="tel" placeholder="+44 7700 900000"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Treatment Interest</label>
+        <select><option>Select a Treatment</option><option>Acne &amp; Scarring</option><option>Laser Therapy</option><option>Skin Rejuvenation</option><option>Anti-Aging Injectables</option><option>Pigmentation</option><option>Cosmetic Dermatology</option><option>Mole Mapping</option><option>Eczema / Psoriasis</option><option>General Consultation</option></select>
+      </div>
+      <div class="form-group"><label>Preferred Date</label><input type="date"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Skin Type</label>
+        <select><option>Select Skin Type</option><option>Fitzpatrick I (Very fair)</option><option>Fitzpatrick II (Fair)</option><option>Fitzpatrick III (Medium)</option><option>Fitzpatrick IV (Olive)</option><option>Fitzpatrick V (Brown)</option><option>Fitzpatrick VI (Dark)</option><option>Unsure — need assessment</option></select>
+      </div>
+      <div class="form-group">
+        <label>Preferred Time</label>
+        <select><option>Any Time</option><option>Morning (8am–12pm)</option><option>Afternoon (12pm–5pm)</option><option>Evening (5pm–8pm)</option></select>
+      </div>
+    </div>
+    <div class="form-group full"><label>Skin Concerns &amp; Notes</label><textarea placeholder="Describe your main skin concerns, previous treatments, allergies or medications..."></textarea></div>
+    <button class="form-submit" id="submitBtn">Request Appointment →</button>
+    <p class="form-note">🔒 Securely encrypted &amp; GDPR compliant. We never share your data.</p>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section id="location">
+  <div class="location-info">
+    <div class="section-tag" style="color:var(--blush)">Find Us</div>
+    <h3>Visit Our Harley Street Clinic</h3>
+    <p style="font-size:.77rem;line-height:1.68;margin-bottom:1rem">Located in the heart of London's world-renowned medical district, our flagship clinic offers a private, premium environment for expert skin consultations.</p>
+    <div class="loc-detail"><span class="loc-ic">📍</span><span>245 Harley Street, Marylebone, London W1G 9PE</span></div>
+    <div class="loc-detail"><span class="loc-ic">🚇</span><span>2 min walk from Great Portland Street (Circle, H&amp;C, Metropolitan lines)</span></div>
+    <div class="loc-detail"><span class="loc-ic">🚗</span><span>Pay &amp; display parking on Harley Street. NCP Cavendish Square nearby.</span></div>
+    <div class="loc-detail"><span class="loc-ic">📞</span><span>+44 20 7946 0321 · care@dermlux.com</span></div>
+    <div class="loc-detail"><span class="loc-ic">🕐</span><span>Mon–Sat: 8:00am – 8:00pm · Sun: Closed</span></div>
+  </div>
+  <div class="map-placeholder reveal-right"><span class="map-ic">🗺️</span><span>Interactive Map</span><span style="font-size:.6rem">245 Harley Street, London W1G 9PE</span></div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a href="#hero" class="footer-logo">Derm<span>Lux</span></a>
+      <p class="footer-tagline">Premium medical dermatology and aesthetic skin treatments by board-certified specialists. Serving patients from across the UK since 2006.</p>
+      <div class="social-links">
+        <a href="#" class="social-btn">📸</a><a href="#" class="social-btn">📘</a><a href="#" class="social-btn">𝕏</a><a href="#" class="social-btn">💼</a><a href="#" class="social-btn">▶</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Treatments</h4>
+      <ul class="footer-links">
+        <li><a href="#services">Acne &amp; Scarring</a></li><li><a href="#services">Laser Therapy</a></li><li><a href="#services">Skin Rejuvenation</a></li><li><a href="#services">Anti-Aging Injectables</a></li><li><a href="#services">Cosmetic Dermatology</a></li><li><a href="#services">Clinical Diagnosis</a></li><li><a href="#services">Mole Mapping</a></li><li><a href="#services">Eczema &amp; Psoriasis</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Clinic</h4>
+      <ul class="footer-links">
+        <li><a href="#about">About Dr. Mitchell</a></li><li><a href="#process">Treatment Process</a></li><li><a href="#tech">Our Technology</a></li><li><a href="#gallery">Results Gallery</a></li><li><a href="#testimonials">Patient Reviews</a></li><li><a href="#faq">FAQ</a></li><li><a href="#booking">Book Appointment</a></li><li><a href="#">Patient Portal</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <div class="contact-item"><span class="ic">📍</span><span>245 Harley Street, London W1G 9PE, UK</span></div>
+      <div class="contact-item"><span class="ic">📞</span><span>+44 20 7946 0321</span></div>
+      <div class="contact-item"><span class="ic">✉️</span><span>care@dermlux.com</span></div>
+      <div class="contact-item"><span class="ic">🕐</span><span>Mon–Sat: 8:00am – 8:00pm</span></div>
+      <div class="contact-item"><span class="ic">🚇</span><span>Great Portland Street tube (2 min)</span></div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 DermLux Clinic Ltd. Company No. 08421739 · CQC Provider ID: 1-234567</span>
+    <div class="footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a><a href="#">Accessibility</a></div>
+  </div>
+</footer>
+
+<script>
+// Cursor
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px'});
+(function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop)})();
+document.querySelectorAll('a,button,.service-card,.testimonial-card,.gallery-card,.step-card,.why-card,.tip-card,.faq-item,.tech-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.width='14px';cursor.style.height='14px';ring.style.width='46px';ring.style.height='46px';ring.style.opacity='.45'});
+  el.addEventListener('mouseleave',()=>{cursor.style.width='8px';cursor.style.height='8px';ring.style.width='30px';ring.style.height='30px';ring.style.opacity='1'});
+});
+
+// Scroll
+window.addEventListener('scroll',()=>{
+  const pct=(window.scrollY/(document.body.scrollHeight-window.innerHeight))*100;
+  document.getElementById('scrollProgress').style.width=pct+'%';
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50);
+});
+
+// Mobile menu
+function openMenu(){document.getElementById('mobMenu').classList.add('open')}
+function closeMenu(){document.getElementById('mobMenu').classList.remove('open')}
+document.getElementById('mobClose').addEventListener('click',closeMenu);
+document.getElementById('hamburger').addEventListener('click',openMenu);
+
+// GSAP
+gsap.registerPlugin(ScrollTrigger);
+
+// Hero entrance
+'.hero-badge,.hero-title,.hero-desc,.hero-conditions,.hero-actions,.hero-stats,.hero-accred'.split(',').forEach((s,i)=>
+  gsap.from(s,{duration:.8,y:25,opacity:0,delay:.2+i*.15,ease:'power3.out'})
+);
+gsap.from('.floating-pill',{duration:1,y:16,opacity:0,stagger:.18,delay:1.1,ease:'power3.out'});
+gsap.from('#heroImg',{duration:1.3,x:60,opacity:0,delay:.25,ease:'power4.out'});
+gsap.from('.hero-img-badge',{duration:.9,scale:.82,opacity:0,delay:.9,ease:'back.out(1.7)'});
+gsap.from('.hero-award-badge',{duration:.9,scale:.82,opacity:0,delay:1.1,ease:'back.out(1.7)'});
+
+// Parallax
+gsap.to('#heroImg',{yPercent:-10,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:1}});
+gsap.to('.floating-pill',{yPercent:-14,ease:'none',scrollTrigger:{trigger:'#hero',start:'top top',end:'bottom top',scrub:.5}});
+
+// Scroll reveals
+gsap.utils.toArray('.reveal').forEach(el=>gsap.from(el,{y:30,opacity:0,duration:.78,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 90%',toggleActions:'play none none none'}}));
+gsap.utils.toArray('.reveal-left').forEach(el=>gsap.from(el,{x:-40,opacity:0,duration:.95,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 84%',toggleActions:'play none none none'}}));
+gsap.utils.toArray('.reveal-right').forEach(el=>gsap.from(el,{x:40,opacity:0,duration:.95,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 84%',toggleActions:'play none none none'}}));
+gsap.utils.toArray('.scale-in').forEach((el,i)=>gsap.from(el,{scale:.9,opacity:0,duration:.78,ease:'power3.out',delay:i*.06,scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none none'}}));
+gsap.utils.toArray('.section-title').forEach(el=>gsap.from(el,{y:28,opacity:0,duration:.82,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 90%',toggleActions:'play none none none'}}));
+gsap.utils.toArray('.section-tag').forEach(el=>gsap.from(el,{x:-14,opacity:0,duration:.68,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 92%',toggleActions:'play none none none'}}));
+
+// Exp bars
+ScrollTrigger.create({trigger:'#about',start:'top 74%',onEnter:()=>document.querySelectorAll('.exp-fill').forEach(b=>b.style.width=b.dataset.width+'%')});
+
+// Stats counter
+ScrollTrigger.create({trigger:'.hero-stats',start:'top 94%',onEnter:()=>{
+  [['s1',15,'K+'],['s2',18,'+'],['s3',98,'%'],['s4',40,'+']].forEach(([id,num,suf])=>{
+    const el=document.getElementById(id),t=performance.now();
+    (function u(now){const p=Math.min((now-t)/1600,1);el.textContent=Math.floor(p*num)+suf;if(p<1)requestAnimationFrame(u)})(t);
+  });
+}});
+
+// Form submit
+document.getElementById('submitBtn').addEventListener('click',function(e){
+  e.preventDefault();this.textContent="✓ Request Sent — We'll Call Within 24hrs!";this.style.background='#4CAF50';
+  setTimeout(()=>{this.textContent='Request Appointment →';this.style.background=''},3500);
+});
+
+// Section parallax
+[['#process',2],['#tips',2]].forEach(([sel,pct])=>gsap.to(sel,{yPercent:-pct,ease:'none',scrollTrigger:{trigger:sel,start:'top bottom',end:'bottom top',scrub:1}}));
+</script>
 </body>
 </html>
