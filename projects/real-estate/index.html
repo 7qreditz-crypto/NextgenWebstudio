@@ -2,81 +2,834 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Real Estate Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <title>Aurevia Estates | Luxury Real Estate</title>
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- GSAP & ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <style>
-    body {
+    /* ----- RESET & VARIABLES ----- */
+    * {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --color-bg: #faf9f7;
+      --color-surface: #ffffff;
+      --color-text: #1e1e1e;
+      --color-text-light: #5a5a5a;
+      --color-accent: #b79b7b;
+      --color-accent-dark: #8e735b;
+      --color-dark-bg: #1a1a1a;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.2);
+      --shadow-sm: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 20px 40px -15px rgba(0, 0, 0, 0.2);
+      --shadow-lg: 0 30px 50px -20px rgba(0, 0, 0, 0.25);
+      --font-serif: 'Playfair Display', serif;
+      --font-sans: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-sans);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* ----- TYPOGRAPHY ----- */
+    h1, h2, h3 {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      margin-bottom: 1.5rem;
+    }
+
+    .section-subhead {
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--color-accent);
+      margin-bottom: 1rem;
+    }
+
+    /* ----- NAVBAR (sticky, transparent, glass on scroll) ----- */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1.8rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      background: transparent;
+    }
+
+    .navbar.scrolled {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-sm);
+      padding: 1rem 3rem;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .navbar.scrolled .logo,
+    .navbar.scrolled .nav-links a {
+      color: var(--color-text);
+    }
+
+    .logo {
+      font-family: var(--font-serif);
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: 1px;
       color: white;
+      transition: color 0.3s;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
-    header {
-      padding: 20px;
-      text-align: center;
-      background: #1e293b;
+    .nav-links {
+      display: flex;
+      gap: 3rem;
     }
 
-    .hero {
-      text-align: center;
-      padding: 80px 20px;
-    }
-
-    .btn {
-      margin-top: 20px;
-      display: inline-block;
-      padding: 10px 20px;
-      background: #22c55e;
-      color: white;
+    .nav-links a {
       text-decoration: none;
-      border-radius: 5px;
+      color: white;
+      font-weight: 400;
+      font-size: 1rem;
+      letter-spacing: 1px;
+      transition: color 0.3s;
+      position: relative;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
-    .properties {
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 1px;
+      bottom: -5px;
+      left: 0;
+      background-color: var(--color-accent);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .navbar.scrolled .nav-links a::after {
+      background-color: var(--color-accent-dark);
+    }
+
+    /* ----- BUTTON STYLES ----- */
+    .btn {
+      display: inline-block;
+      padding: 0.9rem 2.4rem;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.4);
+      color: white;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-decoration: none;
+      transition: all 0.4s;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      backdrop-filter: blur(5px);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: white;
+      transition: left 0.4s;
+      z-index: -1;
+    }
+
+    .btn:hover {
+      color: var(--color-text);
+      border-color: white;
+    }
+
+    .btn:hover::before {
+      left: 0;
+    }
+
+    .btn-dark {
+      border: 1px solid var(--color-text);
+      color: var(--color-text);
+    }
+
+    .btn-dark::before {
+      background: var(--color-text);
+    }
+
+    .btn-dark:hover {
+      color: white;
+      border-color: var(--color-text);
+    }
+
+    /* ----- HERO SECTION ----- */
+    .hero {
+      height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: white;
+      overflow: hidden;
+    }
+
+    .hero-media {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+
+    .hero-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transform: scale(1.1);
+      animation: heroZoom 8s ease-out forwards;
+    }
+
+    @keyframes heroZoom {
+      0% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%);
+      z-index: -1;
+    }
+
+    .hero-content {
+      max-width: 1000px;
+      padding: 0 2rem;
+      z-index: 2;
+    }
+
+    .hero-content h1 {
+      font-size: clamp(3rem, 10vw, 6rem);
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      line-height: 1.1;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .hero-content p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+      font-weight: 300;
+      letter-spacing: 1px;
+      backdrop-filter: blur(4px);
+      padding: 0.5rem 1.5rem;
+      display: inline-block;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 40px;
+    }
+
+    /* ----- SECTIONS LAYOUT ----- */
+    .section {
+      padding: 7rem 5%;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .section-light {
+      background-color: var(--color-bg);
+    }
+
+    .section-dark {
+      background-color: var(--color-dark-bg);
+      color: white;
+    }
+
+    .grid-2 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      padding: 40px;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
     }
 
-    .card {
-      background: #1e293b;
-      padding: 20px;
-      border-radius: 10px;
+    /* ----- PROPERTY CARDS (glassmorphism + hover) ----- */
+    .property-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .property-card {
+      position: relative;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.4s;
+      background: white;
+      height: 400px;
+    }
+
+    .property-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s;
+    }
+
+    .property-card:hover img {
+      transform: scale(1.08);
+    }
+
+    .card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.4s;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+      color: white;
+    }
+
+    .property-card:hover .card-overlay {
+      opacity: 1;
+    }
+
+    .card-overlay h3 {
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+      transform: translateY(20px);
+      transition: transform 0.4s 0.1s;
+    }
+
+    .card-overlay p {
+      transform: translateY(20px);
+      transition: transform 0.4s 0.15s;
+      font-weight: 300;
+    }
+
+    .property-card:hover .card-overlay h3,
+    .property-card:hover .card-overlay p {
+      transform: translateY(0);
+    }
+
+    .card-price {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--color-accent);
+    }
+
+    /* ----- FEATURED CARDS (alternative style) ----- */
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    .featured-card {
+      position: relative;
+      height: 500px;
+      overflow: hidden;
+      border-radius: 4px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .featured-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s;
+    }
+
+    .featured-card:hover img {
+      transform: scale(1.05);
+    }
+
+    .featured-content {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 2rem;
+      background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+      color: white;
+      transform: translateY(70px);
+      transition: transform 0.4s;
+    }
+
+    .featured-card:hover .featured-content {
+      transform: translateY(0);
+    }
+
+    .featured-content h3 {
+      font-size: 2rem;
+    }
+
+    /* ----- ABOUT SECTION ----- */
+    .about-image {
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .about-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .about-text p {
+      margin-bottom: 1.5rem;
+      color: var(--color-text-light);
+      font-size: 1.1rem;
+    }
+
+    /* ----- CONTACT SECTION ----- */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+
+    .glass-form {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      font-family: var(--font-sans);
+      transition: all 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      background: rgba(255,255,255,0.15);
+    }
+
+    .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .map-placeholder {
+      background: #2c2c2c;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      min-height: 350px;
+      background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .map-placeholder::after {
+      content: "📍 123 Luxury Lane, Beverly Hills";
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(5px);
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* ----- FOOTER ----- */
+    .footer {
+      background: #111;
+      color: #aaa;
+      padding: 3rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .social-links a {
+      color: #aaa;
+      font-size: 1.5rem;
+      margin-left: 1.5rem;
+      transition: color 0.3s;
+    }
+
+    .social-links a:hover {
+      color: var(--color-accent);
+    }
+
+    /* ----- RESPONSIVE ----- */
+    @media (max-width: 900px) {
+      .navbar {
+        padding: 1.2rem 2rem;
+      }
+      .nav-links {
+        gap: 1.5rem;
+      }
+      .grid-2, .featured-grid, .contact-grid {
+        grid-template-columns: 1fr;
+      }
+      .featured-grid {
+        gap: 2rem;
+      }
+      .featured-card {
+        height: 400px;
+      }
+      .footer {
+        flex-direction: column;
+        text-align: center;
+      }
+      .social-links a {
+        margin: 0 0.8rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .navbar {
+        padding: 1rem 1.5rem;
+      }
+      .logo {
+        font-size: 1.4rem;
+      }
+      .nav-links {
+        display: none; /* mobile menu off for simplicity, but we keep layout clean */
+      }
+    }
+
+    /* ----- ANIMATION BASE (GSAP will handle) ----- */
+    .fade-target {
+      opacity: 0;
+      y: 30;
     }
   </style>
 </head>
-
 <body>
+  <!-- STICKY NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="logo">Aurevia Estates</div>
+    <div class="nav-links">
+      <a href="#hero">Home</a>
+      <a href="#showcase">Properties</a>
+      <a href="#about">About</a>
+      <a href="#featured">Featured</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
 
-<header>
-  <h1>Real Estate Demo</h1>
-</header>
+  <!-- HERO SECTION (fullscreen) -->
+  <section class="hero" id="hero">
+    <div class="hero-media">
+      <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80" alt="Luxury villa">
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Where Dreams Become Addresses</h1>
+      <p class="hero-sub">Curated residences in the world's most desirable locations</p>
+      <a href="#showcase" class="btn">Explore Collection</a>
+    </div>
+  </section>
 
-<section class="hero">
-  <h2>Find Your Dream Home</h2>
-  <p>Buy, sell, and rent properties easily</p>
-  <a href="#" class="btn">Explore</a>
-</section>
+  <!-- PROPERTY SHOWCASE (grid with hover) -->
+  <section class="section section-light" id="showcase">
+    <div class="section-subhead">The Portfolio</div>
+    <h2>Signature Properties</h2>
+    <div class="property-grid">
+      <div class="property-card">
+        <img src="https://images.unsplash.com/photo-1600595154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Villa">
+        <div class="card-overlay">
+          <h3>Villa Celeste</h3>
+          <p>Saint-Tropez, France</p>
+          <span class="card-price">€12.5M</span>
+        </div>
+      </div>
+      <div class="property-card">
+        <img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Penthouse">
+        <div class="card-overlay">
+          <h3>The Penthouse</h3>
+          <p>New York, NY</p>
+          <span class="card-price">$18.2M</span>
+        </div>
+      </div>
+      <div class="property-card">
+        <img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Estate">
+        <div class="card-overlay">
+          <h3>Château Monceau</h3>
+          <p>Geneva, Switzerland</p>
+          <span class="card-price">CHF 22M</span>
+        </div>
+      </div>
+      <div class="property-card">
+        <img src="https://images.unsplash.com/photo-1600607688969-a5bfcd646154?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Modern Villa">
+        <div class="card-overlay">
+          <h3>Casa Miramar</h3>
+          <p>Malibu, CA</p>
+          <span class="card-price">$26.5M</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<section class="properties">
-  <div class="card">
-    <h3>Luxury Villa</h3>
-    <p>$500,000</p>
-  </div>
+  <!-- ABOUT SECTION (elegant layout) -->
+  <section class="section" id="about">
+    <div class="grid-2">
+      <div class="about-image">
+        <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Luxury living room">
+      </div>
+      <div class="about-text">
+        <div class="section-subhead">Our Philosophy</div>
+        <h2>Redefining <br>Luxury Living</h2>
+        <p>For over two decades, Aurevia Estates has curated an exclusive portfolio of the world’s most extraordinary residences. We don’t just sell property — we curate lifestyles, offering unparalleled access to architectural masterpieces and secluded sanctuaries.</p>
+        <p>Every property in our collection is hand-selected for its design, location, and legacy. Our concierge-like service ensures a seamless experience from first viewing to final signature.</p>
+        <a href="#" class="btn btn-dark">Discover More</a>
+      </div>
+    </div>
+  </section>
 
-  <div class="card">
-    <h3>Modern Apartment</h3>
-    <p>$200,000</p>
-  </div>
+  <!-- FEATURED PROPERTIES SECTION (modern cards) -->
+  <section class="section section-dark" id="featured">
+    <div class="section-subhead">Editor's choice</div>
+    <h2>Currently Featured</h2>
+    <div class="featured-grid">
+      <div class="featured-card">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Featured 1">
+        <div class="featured-content">
+          <h3>Villa Azure</h3>
+          <p>Cap Ferrat, French Riviera</p>
+          <span class="card-price">€34M</span>
+        </div>
+      </div>
+      <div class="featured-card">
+        <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80" alt="Featured 2">
+        <div class="featured-content">
+          <h3>The Sky Residences</h3>
+          <p>Dubai, UAE</p>
+          <span class="card-price">AED 82M</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <div class="card">
-    <h3>Office Space</h3>
-    <p>$300,000</p>
-  </div>
-</section>
+  <!-- CONTACT SECTION with form and map -->
+  <section class="section" id="contact">
+    <div class="section-subhead">Inquire</div>
+    <h2>Begin your journey</h2>
+    <div class="contact-grid">
+      <div class="glass-form">
+        <form id="contactForm">
+          <div class="form-group">
+            <input type="text" placeholder="Full Name" required>
+          </div>
+          <div class="form-group">
+            <input type="email" placeholder="Email Address" required>
+          </div>
+          <div class="form-group">
+            <input type="text" placeholder="Phone (optional)">
+          </div>
+          <div class="form-group">
+            <textarea placeholder="Tell us about your dream property..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-dark" style="width:100%;">Send Enquiry</button>
+        </form>
+      </div>
+      <div class="map-placeholder">
+        <!-- map background image with overlay text -->
+      </div>
+    </div>
+  </section>
 
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="copyright">© 2025 Aurevia Estates. All rights reserved.</div>
+    <div class="social-links">
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-linkedin-in"></i></a>
+      <a href="#"><i class="fab fa-pinterest-p"></i></a>
+      <a href="#"><i class="fab fa-x-twitter"></i></a>
+    </div>
+  </footer>
+
+  <script>
+    (function() {
+      // register ScrollTrigger
+      gsap.registerPlugin(ScrollTrigger);
+
+      // ----- NAVBAR SCROLL EFFECT (transparent to glass) -----
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      });
+
+      // ----- GSAP ANIMATIONS (fade-up, section reveals) -----
+      // Hero content gentle fade-in (already visible but we enhance)
+      gsap.from('.hero-content h1', { duration: 1.2, y: 50, opacity: 0, ease: 'power3.out' });
+      gsap.from('.hero-content p', { duration: 1.2, y: 30, opacity: 0, delay: 0.3, ease: 'power3.out' });
+      gsap.from('.hero-content .btn', { duration: 1.2, y: 30, opacity: 0, delay: 0.6, ease: 'power3.out' });
+
+      // fade-up for all sections using ScrollTrigger
+      const fadeElements = document.querySelectorAll('.section .section-subhead, .section h2, .grid-2, .property-grid, .featured-grid, .contact-grid, .about-image, .about-text');
+      
+      fadeElements.forEach((el) => {
+        gsap.from(el, {
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+          y: 60,
+          opacity: 0,
+          duration: 1,
+          ease: 'power2.out',
+        });
+      });
+
+      // Parallax effect for hero image (subtle)
+      gsap.to('.hero-media img', {
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1,
+        },
+        y: 100,
+        ease: 'none',
+      });
+
+      // card hover animations are via CSS, but we can add small GSAP for extra?
+      // Already fine.
+
+      // Smooth section transitions: already with scrolltrigger.
+      
+      // Additional animation for property cards on scroll (group)
+      gsap.from('.property-card', {
+        scrollTrigger: {
+          trigger: '#showcase',
+          start: 'top 80%',
+        },
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'back.out(1.2)',
+      });
+
+      // featured cards stagger
+      gsap.from('.featured-card', {
+        scrollTrigger: {
+          trigger: '#featured',
+          start: 'top 80%',
+        },
+        y: 60,
+        opacity: 0,
+        duration: 0.9,
+        stagger: 0.2,
+      });
+
+      // Contact form glassmorphism subtle pop
+      gsap.from('.glass-form, .map-placeholder', {
+        scrollTrigger: {
+          trigger: '#contact',
+          start: 'top 80%',
+        },
+        scale: 0.95,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power2.out',
+      });
+
+      // Prevent form submission for demo
+      document.getElementById('contactForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Thank you for your interest. A concierge will respond within 24 hours.');
+      });
+    })();
+  </script>
+  <!-- ensure that navbar is transparent on load, fix initial flash if any -->
+  <style>
+    /* fallback for very small devices */
+    .navbar {
+      background: transparent;
+    }
+    .navbar.scrolled {
+      background: rgba(255, 255, 255, 0.75);
+    }
+    .section-dark .glass-form input, 
+    .section-dark .glass-form textarea {
+      color: white;
+    }
+    .glass-form input::placeholder,
+    .glass-form textarea::placeholder {
+      color: rgba(255,255,255,0.6);
+    }
+  </style>
 </body>
 </html>
