@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Real Estate Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      background: #1e293b;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    .btn {
+      margin-top: 20px;
+      display: inline-block;
+      padding: 10px 20px;
+      background: #22c55e;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    .properties {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 40px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Real Estate Demo</h1>
+</header>
+
+<section class="hero">
+  <h2>Find Your Dream Home</h2>
+  <p>Buy, sell, and rent properties easily</p>
+  <a href="#" class="btn">Explore</a>
+</section>
+
+<section class="properties">
+  <div class="card">
+    <h3>Luxury Villa</h3>
+    <p>$500,000</p>
+  </div>
+
+  <div class="card">
+    <h3>Modern Apartment</h3>
+    <p>$200,000</p>
+  </div>
+
+  <div class="card">
+    <h3>Office Space</h3>
+    <p>$300,000</p>
+  </div>
+</section>
+
+</body>
+</html>
